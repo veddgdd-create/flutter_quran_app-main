@@ -216,7 +216,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    'Repository: github.com/r-shafi/flutter_quran_app',
+                    'Repository: ghttps://github.com/veddgdd-create/flutter_quran_app-main',
                     style: textTheme.labelSmall?.copyWith(
                       color: context.palette.textMuted,
                     ),
