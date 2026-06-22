@@ -289,8 +289,12 @@ class Meta {
         latitudeAdjustmentMethod: json["latitudeAdjustmentMethod"],
         midnightMode: json["midnightMode"],
         school: json["school"],
-        offset:
-            Map.from(json["offset"]).map((k, v) => MapEntry<String, int>(k, v)),
+        offset: Map.from(json["offset"]).map(
+          (k, v) => MapEntry<String, int>(
+            k,
+            v is int ? v : (v as num).round(),
+          ),
+        ),
       );
 
   Map<String, dynamic> toMap() => {
@@ -354,18 +358,33 @@ class Location {
       };
 }
 
+// =======================================================================
+// ✅ هنا كان مكان المشكلة بالضبط (type 'double' is not a subtype of type 'int')
+//
+// السبب: حقول Fajr/Isha داخل "method.params" تمثل زاوية الحساب الفلكي،
+// وبعض طرق الحساب (مثل ISNA أو Egyptian General Authority) ترجعها كـ
+// double (مثل 18.0) بينما طرق أخرى ترجعها كعدد صحيح. كانت الحقول معرّفة
+// بنوع "int" بشكل صارم، فكان أي رقم عشري يكسر الـ cast فورًا.
+//
+// الحل: استخدام "num" بدل "int" (يقبل كل من int و double)، مع تحويل
+// آمن في حال رجعت القيمة كنص نادرًا.
+// =======================================================================
 class Params {
   Params({
     required this.fajr,
     required this.isha,
   });
 
-  final int fajr;
-  final int isha;
+  final num fajr;
+  final num isha;
 
   factory Params.fromMap(Map<String, dynamic> json) => Params(
-        fajr: json["Fajr"],
-        isha: json["Isha"],
+        fajr: json["Fajr"] is num
+            ? json["Fajr"]
+            : num.parse(json["Fajr"].toString()),
+        isha: json["Isha"] is num
+            ? json["Isha"]
+            : num.parse(json["Isha"].toString()),
       );
 
   Map<String, dynamic> toMap() => {
