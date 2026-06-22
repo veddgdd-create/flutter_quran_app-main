@@ -453,58 +453,69 @@ class _PrayerTimesStripState extends State<_PrayerTimesStrip> {
       scrollDirection: Axis.horizontal,
       child: Padding(
         padding: const EdgeInsets.only(top: AppSpacing.sm),
-        child: Row(
-          children: List.generate(_data.length, (index) {
-            final item = _data[index];
-            final isNext = index == _nextIndex;
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: List.generate(_data.length, (index) {
+              final item = _data[index];
+              final isNext = index == _nextIndex;
 
-            return Padding(
-              padding: EdgeInsets.only(
-                  right: index == _data.length - 1 ? 0 : AppSpacing.md),
-              child: SizedBox(
-                width: AppSizes.prayerCardWidth,
-                height: AppSizes.prayerCardHeight,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    PressableCard(
-                      onTap: widget.onOpenPrayerScreen,
-                      glow: isNext,
-                      backgroundColor: isNext
-                          ? context.palette.bgElevated
-                          : context.palette.bgSurface,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            item['name']!,
-                            style: textTheme.labelSmall?.copyWith(
-                              color: context.palette.textSecondary,
+              return Padding(
+                padding: EdgeInsets.only(
+                    right: index == _data.length - 1 ? 0 : AppSpacing.md),
+                child: SizedBox(
+                  // ✅ تم حذف "height: AppSizes.prayerCardHeight" خالص.
+                  // العرض ثابت زي ما هو، والارتفاع بقى تلقائي.
+                  width: AppSizes.prayerCardWidth,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      PressableCard(
+                        onTap: widget.onOpenPrayerScreen,
+                        glow: isNext,
+                        backgroundColor: isNext
+                            ? context.palette.bgElevated
+                            : context.palette.bgSurface,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              item['name']!,
+                              // ✅ سطر واحد بس مهما كان طول الاسم
+                              // (يمنع اختلاف الـ overflow بين الكروت)
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: textTheme.labelSmall?.copyWith(
+                                color: context.palette.textSecondary,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: AppSpacing.xs),
-                          Text(
-                            item['time']!,
-                            style: textTheme.titleMedium?.copyWith(
-                              color: context.palette.goldPrimary,
+                            const SizedBox(height: AppSpacing.xs),
+                            Text(
+                              item['time']!,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: textTheme.titleMedium?.copyWith(
+                                color: context.palette.goldPrimary,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    if (isNext)
-                      Positioned(
-                        top: -AppSpacing.sm,
-                        left: AppSpacing.sm,
-                        child: const GoldBadge(label: 'Next', compact: true),
-                      ),
-                  ],
+                      if (isNext)
+                        Positioned(
+                          top: -AppSpacing.sm,
+                          left: AppSpacing.sm,
+                          child: const GoldBadge(label: 'Next', compact: true),
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          }),
+              );
+            }),
+          ),
         ),
       ),
     );
